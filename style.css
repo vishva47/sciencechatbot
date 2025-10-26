@@ -1,0 +1,162 @@
+/* Global */
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: #0d1117;
+  color: #fff;
+}
+
+/* Auth */
+.auth-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.auth-container {
+  background: #161b22;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+}
+
+.auth-container h2 {
+  margin-bottom: 1rem;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1rem;
+}
+
+.tabs button {
+  background: none;
+  color: #ccc;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+.tabs button.active {
+  color: #fff;
+  border-bottom: 2px solid #007bff;
+}
+
+form input {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+}
+
+form button {
+  width: 100%;
+  background: #007bff;
+  border: none;
+  padding: 10px;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#message {
+  margin-top: 1rem;
+  color: #f66;
+}
+
+/* Chat */
+.chat-body {
+  display: flex;
+  height: 100vh;
+}
+
+.chat-container {
+  display: flex;
+  width: 100%;
+}
+
+.sidebar {
+  width: 25%;
+  background: #161b22;
+  padding: 1rem;
+  overflow-y: auto;
+  border-right: 1px solid #222;
+}
+
+.sidebar h3 {
+  margin-bottom: 1rem;
+  color: #58a6ff;
+}
+
+.history-item {
+  padding: 0.5rem;
+  margin-bottom: 5px;
+  background: #21262d;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.history-item:hover {
+  background: #30363d;
+}
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.chat-box {
+  padding: 1rem;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.msg {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  max-width: 70%;
+}
+
+.msg.user {
+  background: #238636;
+  align-self: flex-end;
+}
+
+.msg.bot {
+  background: #21262d;
+  align-self: flex-start;
+}
+
+.input-area {
+  display: flex;
+  border-top: 1px solid #333;
+  padding: 1rem;
+}
+
+.input-area input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  margin-right: 10px;
+}
+
+.input-area button {
+  background: #007bff;
+  border: none;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}

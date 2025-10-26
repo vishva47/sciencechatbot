@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Chat Assistant - Login</title>
+<style>
+  body {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    color: white;
+    font-family: "Poppins", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: #1e293b;
+    padding: 2rem 3rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    width: 350px;
+    text-align: center;
+  }
+  h2 { margin-bottom: 1rem; }
+  input {
+    width: 90%; padding: 0.8rem; margin: 0.5rem 0;
+    border: none; border-radius: 0.5rem; outline: none;
+  }
+  button {
+    width: 95%; padding: 0.8rem; margin-top: 1rem;
+    background: #38bdf8; border: none; color: white;
+    border-radius: 0.5rem; cursor: pointer; font-weight: bold;
+    transition: 0.3s;
+  }
+  button:hover { background: #0ea5e9; }
+  p { font-size: 0.9rem; }
+  a { color: #38bdf8; text-decoration: none; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2 id="formTitle">Sign Up</h2>
+  <form id="authForm">
+    <input type="text" id="username" placeholder="Username" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button type="submit">Sign Up</button>
+  </form>
+  <p id="toggleText">
+    Already have an account? <a id="toggleLink">Login here</a>
+  </p>
+  <p id="message"></p>
+</div>
+
+<script>
+let isSignup = true;
+
+function toggleMode() {
+  isSignup = !isSignup;
+  document.getElementById("formTitle").innerText = isSignup ? "Sign Up" : "Login";
+  document.querySelector("button").innerText = isSignup ? "Sign Up" : "Login";
+  document.getElementById("toggleText").innerHTML = isSignup
+    ? `Already have an account? <a id="toggleLink">Login here</a>`
+    : `Don't have an account? <a id="toggleLink">Sign up here</a>`;
+  document.getElementById("toggleLink").addEventListener("click", toggleMode);
+}
+
+document.getElementById("toggleLink").addEventListener("click", toggleMode);
+
+document.getElementById("authForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const endpoint = isSignup ? "/signup" : "/login";
+
+  const res = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
+
+  const data = await res.json();
+  document.getElementById("message").textContent = data.message;
+
+  if (res.ok && data.message.toLowerCase().includes("successful")) {
+    localStorage.setItem("username", username);
+    window.location.href = "/chat";
+  }
+});
+</script>
+</body>
+</html>

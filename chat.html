@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Chat Assistant</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+<style>
+  pre { background-color: #1f2937; padding: 8px; border-radius: 0.5rem; overflow-x: auto; color: #facc15; }
+  .bullet { margin-left: 1rem; list-style-type: disc; }
+  .formula { color: #34d399; font-weight: bold; }
+  .bot-message, .user-message { display: inline-block; padding: 0.5rem 1rem; border-radius: 1rem; max-width: 80%; white-space: pre-line; }
+  .user-message { background-color: #2563eb; }
+</style>
+</head>
+<body class="bg-gray-900 text-white font-sans h-screen flex items-center justify-center">
+
+<div class="w-full max-w-3xl h-[85vh] bg-gray-800 rounded-2xl flex flex-col overflow-hidden shadow-lg">
+  <div class="flex justify-between items-center bg-gray-900 p-4 border-b border-gray-700">
+    <h1 class="text-xl font-semibold text-blue-400">🤖 Smart Chat Assistant</h1>
+    <div class="space-x-2">
+      <button id="scienceBtn" class="px-3 py-1 rounded-lg bg-blue-600">🧠 Science</button>
+      <button id="medicalBtn" class="px-3 py-1 rounded-lg bg-gray-600">🩺 Medical</button>
+    </div>
+  </div>
+
+  <div id="chatArea" class="flex-1 p-4 overflow-y-auto">
+    <div class="p-3 bg-gray-700 rounded-xl inline-block">
+      👋 Hi! I’m your smart assistant. Switch between Science 🧠 or Medical 🩺 anytime.
+    </div>
+  </div>
+
+  <div class="p-4 bg-gray-900 border-t border-gray-700 flex gap-2">
+    <input id="question" type="text" placeholder="Type your question..." class="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white focus:outline-none">
+    <button id="sendBtn" class="px-5 py-2 bg-blue-600 rounded-lg hover:bg-blue-700">➤</button>
+  </div>
+</div>
+
+<script>
+const chatArea = document.getElementById("chatArea");
+const questionInput = document.getElementById("question");
+const sendBtn = document.getElementById("sendBtn");
+const scienceBtn = document.getElementById("scienceBtn");
+const medicalBtn = document.getElementById("medicalBtn");
+let mode = localStorage.getItem("mode") || "science";
+
+function updateModeButtons() {
+  scienceBtn.classList.toggle("bg-blue-600", mode==="science");
+  scienceBtn.classList.toggle("bg-gray-600", mode!=="science");
+  medicalBtn.classList.toggle("bg-gray-600", true);
+}
+scienceBtn.addEventListener("click", () => { mode="science"; localStorage.setItem("mode", mode); appendMessage("🧠 Science mode activated."); updateModeButtons(); });
+medicalBtn.addEventListener("click", () => { mode="medical"; localStorage.setItem("mode", mode); appendMessage("🩺 Medical mode activated."); updateModeButtons(); });
+updateModeButtons();
+
+function appendMessage(content, sender="bot", typing=false){
+  const msg=document.createElement("div"); msg.className="my-2";
+  if(sender==="user"){ msg.innerHTML=`<div class="user-message">${content}</div>`; }
+  else{
+    const bgClass="bg-gray-700"; 
+    const icon = mode==="science"?"🧠":"🩺";
+    content = content.replace(/Formula:/g,'<span class="formula">Formula:</span>');
+    content = content.split("\n").map(line=>{
+      if(line.startsWith("-")||line.startsWith("*")) return `<li class="bullet">${line.slice(1).trim()}</li>`;
+      if(line.startsWith("```")&&line.endsWith("```")) return `<pre>${line.slice(3,-3)}</pre>`;
+      return line;
+    }).join("\n");
+    msg.innerHTML = typing ? `<div class="bot-message ${bgClass} opacity-70">${icon}</div>` : `<div class="bot-message ${bgClass}">${icon} ${content}</div>`;
+  }
+  chatArea.appendChild(msg);
+  chatArea.scrollTop = chatArea.scrollHeight;
+  return msg;
+}
+
+async function typeMessage(content, sender="bot"){
+  const msg=appendMessage("",sender,true);
+  const bubble=msg.firstChild; let index=0;
+  const icon = sender==="bot"? (mode==="science"?"🧠":"🩺")+" ":"";
+  const typingSpeed=20;
+  while(index<content.length){
+    bubble.innerHTML=icon+content.slice(0,index+1);
+    index++; await new Promise(r=>setTimeout(r,typingSpeed));
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+  bubble.classList.remove("opacity-70");
+}
+
+async function sendMessage(){
+  const question=questionInput.value.trim();
+  if(!question) return; appendMessage(question,"user");
+  questionInput.value="";
+  await typeMessage("Typing...","bot");
+  try{
+    const res=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question,mode})});
+    const data=await res.json(); chatArea.lastChild.remove();
+    let formatted=data.answer||"⚠️ Error fetching response.";
+    await typeMessage(formatted,"bot");
+  }catch{
+    chatArea.lastChild.remove();
+    appendMessage("⚠️ Server error. Try again.");
+  }
+}
+
+sendBtn.addEventListener("click",sendMessage);
+questionInput.addEventListener("keypress",(e)=> e.key==="Enter" && sendMessage());
+</script>
+</body>
+</html>
